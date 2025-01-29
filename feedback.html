@@ -9,27 +9,43 @@
 <body>
 
   <h1>Course Feedback</h1>
+  <p>Course: <strong id="course-name"></strong></p> <!-- Empty until set by JS -->
   <p>Was this course helpful?</p>
   <button class="good" id="good">Good</button>
   <button class="bad" id="bad">Bad</button>
   <p id="response"></p>
 
   <script>
-    const airtableBaseId = "appdInia1qyUjAidC"; 
-    const airtableAccessToken = "patBZxhjgsquYzhaO.c2d270203a820101383cf2721d53e40b99d7fb7a98c1242f94589075c8d2e305"; 
-    const tableName = "Academy Feedback";
+    const airtableBaseId = "appdInia1qyUjAidC"; // Replace with your Airtable base ID
+    const airtableAccessToken = "patBZxhjgsquYzhaO.c2d270203a820101383cf2721d53e40b99d7fb7a98c1242f94589075c8d2e305"; // Replace with your Airtable API token
+    const tableName = "Academy Feedback"; // Replace with your Airtable table name
+
+    // Function to extract the course name from the SCORM file URL
+    function getCourseNameFromURL() {
+      const path = window.location.pathname;
+      const filename = path.split("/").pop(); // Get the last part of the URL (the filename)
+      const courseName = filename.replace(".html", ""); // Remove the .html extension (or modify based on your SCORM file format)
+      return courseName;
+    }
+
+    // Set the course name dynamically
+    const courseName = getCourseNameFromURL();
+    document.getElementById("course-name").textContent = courseName; // Set the course name in the HTML
 
     function sendToAirtable(feedback) {
       const url = `https://api.airtable.com/v0/${airtableBaseId}/${encodeURIComponent(tableName)}`;
       const data = { 
         records: [{ 
           fields: { 
-            Feedback: feedback, 
-            Timestamp: new Date().toISOString() 
+            CourseName: courseName, // Send dynamically fetched course name
+            Feedback: feedback, // Send feedback (Good/Bad)
+            Timestamp: new Date().toISOString() // Add timestamp
           } 
         }] 
       };
 
+      console.log("Sending data to Airtable:", data); // Log the data being sent
+      
       fetch(url, {
         method: "POST",
         headers: { 
@@ -38,11 +54,18 @@
         },
         body: JSON.stringify(data),
       })
-      .then(response => response.ok ? 
-        document.getElementById("response").textContent = "Feedback sent!" : 
-        document.getElementById("response").textContent = "Error sending feedback."
-      )
-      .catch(error => document.getElementById("response").textContent = "Error sending feedback.");
+      .then(response => {
+        console.log("Response:", response); // Log the response
+        if (response.ok) {
+          document.getElementById("response").textContent = "Feedback sent!";
+        } else {
+          document.getElementById("response").textContent = "Error sending feedback.";
+        }
+      })
+      .catch(error => {
+        console.log("Error:", error); // Log any error
+        document.getElementById("response").textContent = "Error sending feedback.";
+      });
     }
 
     document.getElementById("good").addEventListener("click", () => sendToAirtable("Good"));
