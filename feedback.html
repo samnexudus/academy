@@ -3,82 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Course Feedback</title>
+    <title>Feedback</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            margin: 50px;
+            padding: 20px;
         }
-        .button-container {
-            margin-top: 20px;
+        .feedback-buttons {
+            margin: 20px 0;
         }
-        button {
-            font-size: 18px;
+        .feedback-buttons button {
             padding: 10px 20px;
+            font-size: 16px;
             margin: 10px;
             cursor: pointer;
-            border: none;
-            border-radius: 5px;
-        }
-        .good {
-            background-color: #4CAF50;
-            color: white;
-        }
-        .bad {
-            background-color: #f44336;
-            color: white;
-        }
-        #message {
-            margin-top: 20px;
-            font-weight: bold;
         }
     </style>
 </head>
 <body>
 
-    <h1>How was this course?</h1>
-    <p>Please provide your feedback:</p>
+    <h1>Course Feedback</h1>
+    <p>Please provide your feedback on the course.</p>
 
-    <div class="button-container">
-        <button class="good" onclick="sendFeedback('Good')">Good 👍</button>
-        <button class="bad" onclick="sendFeedback('Bad')">Bad 👎</button>
+    <div class="feedback-buttons">
+        <button id="good-btn" style="background-color: green; color: white;">Good</button>
+        <button id="bad-btn" style="background-color: red; color: white;">Bad</button>
     </div>
 
-    <p id="message"></p>
+    <p id="status-message"></p>
 
     <script>
-        function getCourseName() {
-            // Extracts the course name from the URL or defaults to "Unknown Course"
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('course') || "Unknown Course";
-        }
+        // Webhook URL to Airtable
+        const webhookUrl = "https://hooks.airtable.com/workflows/v1/genericWebhook/appdInia1qyUjAidC/wfl7NhRg3j8GZ83cq/wtrqlYKwEyA9yu68K";  // Replace with your actual Airtable Webhook URL
 
+        // Get the course name from the current URL or a static name
+        const courseName = document.title;  // You can replace this with a static name or another dynamic source if needed
+
+        // Handle feedback button clicks
+        document.getElementById('good-btn').addEventListener('click', function() {
+            sendFeedback('Good');
+        });
+
+        document.getElementById('bad-btn').addEventListener('click', function() {
+            sendFeedback('Bad');
+        });
+
+        // Function to send feedback to Airtable webhook
         function sendFeedback(feedback) {
-            const courseName = getCourseName();
-            const webhookURL = "https://your-netlify-site.netlify.app/.netlify/functions/send-feedback";
-
-            const data = {
-                Coursename: courseName,
-                Feedback: feedback
+            const feedbackData = {
+                fields: {
+                    "Coursename": courseName,
+                    "Feedback": feedback
+                }
             };
 
-            fetch(webhookURL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(data),
+            // Display status message while feedback is being sent
+            document.getElementById('status-message').innerText = "Sending feedback...";
+
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(feedbackData)
             })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Failed to send feedback");
-                }
-                return response.json();
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('status-message').innerText = "Feedback sent successfully!";
+                console.log('Success:', data);
             })
-            .then(() => {
-                document.getElementById("message").innerText = "Thank you for your feedback!";
-            })
-            .catch(() => {
-                document.getElementById("message").innerText = "Error submitting feedback. Please try again.";
+            .catch(error => {
+                document.getElementById('status-message').innerText = "Failed to send feedback.";
+                console.error('Error:', error);
             });
         }
     </script>
