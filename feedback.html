@@ -1,59 +1,53 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2487.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Feedback</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;title&gt;Course Feedback&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }</p>
-<p class="p1"><span class="Apple-converted-space">    </span>button { font-size: 18px; padding: 10px 20px; margin: 10px; cursor: pointer; }</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;h1&gt;Course Feedback&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;p&gt;Was this course helpful?&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;button id="good"&gt;Good&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;button id="bad"&gt;Bad&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;p id="response"&gt;&lt;/p&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>const airtableBaseId = "appdInia1qyUjAidC";<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const airtableAccessToken = "patBZxhjgsquYzhaO.c2d270203a820101383cf2721d53e40b99d7fb7a98c1242f94589075c8d2e305";<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">    </span>const tableName = "Academy Feedback";</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>function sendToAirtable(feedback) {</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const url = `https://api.airtable.com/v0/${airtableBaseId}/${encodeURIComponent(tableName)}`;</p>
-<p class="p1"><span class="Apple-converted-space">      </span>const data = { records: [{ fields: { Feedback: feedback, Timestamp: new Date().toISOString() } }] };</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">      </span>fetch(url, {</p>
-<p class="p1"><span class="Apple-converted-space">        </span>method: "POST",</p>
-<p class="p1"><span class="Apple-converted-space">        </span>headers: { "Content-Type": "application/json", Authorization: `Bearer ${airtableAccessToken}` },</p>
-<p class="p1"><span class="Apple-converted-space">        </span>body: JSON.stringify(data),</p>
-<p class="p1"><span class="Apple-converted-space">      </span>})</p>
-<p class="p1"><span class="Apple-converted-space">      </span>.then(response =&gt; response.ok ? document.getElementById("response").textContent = "Feedback sent!" : document.getElementById("response").textContent = "Error sending feedback.")</p>
-<p class="p1"><span class="Apple-converted-space">      </span>.catch(error =&gt; document.getElementById("response").textContent = "Error sending feedback.");</p>
-<p class="p1"><span class="Apple-converted-space">    </span>}</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("good").addEventListener("click", () =&gt; sendToAirtable("Good"));</p>
-<p class="p1"><span class="Apple-converted-space">    </span>document.getElementById("bad").addEventListener("click", () =&gt; sendToAirtable("Bad"));</p>
-<p class="p1"><span class="Apple-converted-space">  </span>&lt;/script&gt;</p>
-<p class="p2"><br></p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+
+  <h1>Course Feedback</h1>
+  <p>Was this course helpful?</p>
+  <button class="good" id="good">Good</button>
+  <button class="bad" id="bad">Bad</button>
+  <p id="response"></p>
+
+  <script>
+    const airtableBaseId = "appdInia1qyUjAidC"; 
+    const airtableAccessToken = "patBZxhjgsquYzhaO.c2d270203a820101383cf2721d53e40b99d7fb7a98c1242f94589075c8d2e305"; 
+    const tableName = "Academy Feedback";
+
+    function sendToAirtable(feedback) {
+      const url = `https://api.airtable.com/v0/${airtableBaseId}/${encodeURIComponent(tableName)}`;
+      const data = { 
+        records: [{ 
+          fields: { 
+            Feedback: feedback, 
+            Timestamp: new Date().toISOString() 
+          } 
+        }] 
+      };
+
+      fetch(url, {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json", 
+          Authorization: `Bearer ${airtableAccessToken}` 
+        },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.ok ? 
+        document.getElementById("response").textContent = "Feedback sent!" : 
+        document.getElementById("response").textContent = "Error sending feedback."
+      )
+      .catch(error => document.getElementById("response").textContent = "Error sending feedback.");
+    }
+
+    document.getElementById("good").addEventListener("click", () => sendToAirtable("Good"));
+    document.getElementById("bad").addEventListener("click", () => sendToAirtable("Bad"));
+  </script>
+
 </body>
 </html>
