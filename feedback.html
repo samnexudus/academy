@@ -37,7 +37,7 @@
       const data = { 
         records: [{ 
           fields: { 
-            CourseName: courseName, // Send dynamically fetched course name
+            CourseName: courseName, // Send dynamically fetched course name (updated field name)
             Feedback: feedback, // Send feedback (Good/Bad)
             Timestamp: new Date().toISOString() // Add timestamp
           } 
@@ -45,7 +45,7 @@
       };
 
       console.log("Sending data to Airtable:", data); // Log the data being sent
-      
+
       fetch(url, {
         method: "POST",
         headers: { 
@@ -54,16 +54,18 @@
         },
         body: JSON.stringify(data),
       })
-      .then(response => {
-        console.log("Response:", response); // Log the response
-        if (response.ok) {
-          document.getElementById("response").textContent = "Feedback sent!";
+      .then(response => response.json()) // Parse response as JSON
+      .then(responseData => {
+        console.log("Response data:", responseData); // Log the parsed response
+        if (responseData.error) {
+          console.error("Error from Airtable:", responseData.error.message); // Log detailed error message
+          document.getElementById("response").textContent = "Error sending feedback: " + responseData.error.message;
         } else {
-          document.getElementById("response").textContent = "Error sending feedback.";
+          document.getElementById("response").textContent = "Feedback sent!";
         }
       })
       .catch(error => {
-        console.log("Error:", error); // Log any error
+        console.log("Error:", error); // Log any fetch errors
         document.getElementById("response").textContent = "Error sending feedback.";
       });
     }
