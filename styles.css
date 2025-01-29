@@ -1,0 +1,1 @@
+body {  font-family: Arial, sans-serif;  text-align: center;  padding: 20px;}button {  font-size: 18px;  padding: 10px 20px;  margin: 10px;  cursor: pointer;}.good {  background-color: green;  color: white;  border: none;}.bad {  background-color: red;  color: white;  border: none;}
