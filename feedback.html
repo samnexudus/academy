@@ -9,69 +9,52 @@
 <body>
 
   <h1>Course Feedback</h1>
-  <p>Course: <strong id="course-name"></strong></p> <!-- Empty until set by JS -->
+  <p>Course: <strong id="course-name"></strong></p>
   <p>Was this course helpful?</p>
   <button class="good" id="good">Good</button>
   <button class="bad" id="bad">Bad</button>
   <p id="response"></p>
 
   <script>
-    const airtableBaseId = "appdInia1qyUjAidC"; // Replace with your Airtable base ID
-    const airtableAccessToken = "patBZxhjgsquYzhaO.c2d270203a820101383cf2721d53e40b99d7fb7a98c1242f94589075c8d2e305"; // Replace with your Airtable API token
-    const tableName = "Academy Feedback"; // Replace with your Airtable table name
+    const webhookURL = "https://hooks.airtable.com/workflows/v1/genericWebhook/appdInia1qyUjAidC/wfl7NhRg3j8GZ83cq/wtrqlYKwEyA9yu68K"; 
 
     // Function to extract the course name from the SCORM file URL
     function getCourseNameFromURL() {
       const path = window.location.pathname;
-      const filename = path.split("/").pop(); // Get the last part of the URL (the filename)
-      const courseName = filename.replace(".html", ""); // Remove the .html extension (or modify based on your SCORM file format)
-      return courseName;
+      const filename = path.split("/").pop(); 
+      return filename.replace(".html", ""); 
     }
 
-    // Set the course name dynamically
     const courseName = getCourseNameFromURL();
-    document.getElementById("course-name").textContent = courseName; // Set the course name in the HTML
+    document.getElementById("course-name").textContent = courseName; 
 
-    function sendToAirtable(feedback) {
-      const url = `https://api.airtable.com/v0/${airtableBaseId}/${encodeURIComponent(tableName)}`;
+    function sendToWebhook(feedback) {
       const data = { 
-        records: [{ 
-          fields: { 
-            CourseName: courseName, // Send dynamically fetched course name (updated field name)
-            Feedback: feedback, // Send feedback (Good/Bad)
-            Timestamp: new Date().toISOString() // Add timestamp
-          } 
-        }] 
+        CourseName: courseName, 
+        Feedback: feedback, 
+        Timestamp: new Date().toISOString() 
       };
 
-      console.log("Sending data to Airtable:", data); // Log the data being sent
+      console.log("Sending data to Webhook:", data);
 
-      fetch(url, {
+      fetch(webhookURL, {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json", 
-          Authorization: `Bearer ${airtableAccessToken}` 
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       })
-      .then(response => response.json()) // Parse response as JSON
+      .then(response => response.json())
       .then(responseData => {
-        console.log("Response data:", responseData); // Log the parsed response
-        if (responseData.error) {
-          console.error("Error from Airtable:", responseData.error.message); // Log detailed error message
-          document.getElementById("response").textContent = "Error sending feedback: " + responseData.error.message;
-        } else {
-          document.getElementById("response").textContent = "Feedback sent!";
-        }
+        console.log("Response from Webhook:", responseData);
+        document.getElementById("response").textContent = "Feedback sent!";
       })
       .catch(error => {
-        console.log("Error:", error); // Log any fetch errors
+        console.error("Error:", error);
         document.getElementById("response").textContent = "Error sending feedback.";
       });
     }
 
-    document.getElementById("good").addEventListener("click", () => sendToAirtable("Good"));
-    document.getElementById("bad").addEventListener("click", () => sendToAirtable("Bad"));
+    document.getElementById("good").addEventListener("click", () => sendToWebhook("Good"));
+    document.getElementById("bad").addEventListener("click", () => sendToWebhook("Bad"));
   </script>
 
 </body>
