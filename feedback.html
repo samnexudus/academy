@@ -1,84 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Feedback</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding: 20px;
-        }
-        .feedback-buttons {
-            margin: 20px 0;
-        }
-        .feedback-buttons button {
-            padding: 10px 20px;
-            font-size: 16px;
-            margin: 10px;
-            cursor: pointer;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Course Feedback</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <h1>Course Feedback</h1>
-    <p>Please provide your feedback on the course.</p>
+  <h1>Course Feedback</h1>
+  <p>Course: <strong id="course-name"></strong></p>
+  <p>Was this course helpful?</p>
+  <button class="good" id="good">Good</button>
+  <button class="bad" id="bad">Bad</button>
+  <p id="response"></p>
 
-    <div class="feedback-buttons">
-        <button id="good-btn" style="background-color: green; color: white;">Good</button>
-        <button id="bad-btn" style="background-color: red; color: white;">Bad</button>
-    </div>
+  <script>
+    const webhookURL = "https://hooks.airtable.com/workflows/v1/genericWebhook/appdInia1qyUjAidC/wfl7NhRg3j8GZ83cq/wtrqlYKwEyA9yu68K"; 
 
-    <p id="status-message"></p>
+    // Function to extract the course name from the SCORM file URL
+    function getCourseNameFromURL() {
+      const path = window.location.pathname;
+      const filename = path.split("/").pop(); 
+      return filename.replace(".html", ""); 
+    }
 
-    <script>
-        // Webhook URL to Airtable
-        const webhookUrl = "https://hooks.airtable.com/workflows/v1/genericWebhook/appdInia1qyUjAidC/wfl7NhRg3j8GZ83cq/wtrqlYKwEyA9yu68K";  // Replace with your actual Airtable Webhook URL
+    const courseName = getCourseNameFromURL();
+    document.getElementById("course-name").textContent = courseName; 
 
-        // Get the course name from the current URL or a static name
-        const courseName = document.title;  // You can replace this with a static name or another dynamic source if needed
+    function sendToWebhook(feedback) {
+      const data = { 
+        CourseName: courseName, 
+        Feedback: feedback, 
+        Timestamp: new Date().toISOString() 
+      };
 
-        // Handle feedback button clicks
-        document.getElementById('good-btn').addEventListener('click', function() {
-            sendFeedback('Good');
-        });
+      console.log("Sending data to Webhook:", data);
 
-        document.getElementById('bad-btn').addEventListener('click', function() {
-            sendFeedback('Bad');
-        });
+      fetch(webhookURL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+      .then(response => response.json())
+      .then(responseData => {
+        console.log("Response from Webhook:", responseData);
+        document.getElementById("response").textContent = "Feedback sent!";
+      })
+      .catch(error => {
+        console.error("Error:", error);
+        document.getElementById("response").textContent = "Error sending feedback.";
+      });
+    }
 
-        // Function to send feedback to Airtable webhook
-        function sendFeedback(feedback) {
-            const feedbackData = {
-                fields: {
-                    "Coursename": courseName,
-                    "Feedback": feedback
-                }
-            };
-
-            // Display status message while feedback is being sent
-            document.getElementById('status-message').innerText = "Sending feedback...";
-
-            fetch(webhookUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(feedbackData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('status-message').innerText = "Feedback sent successfully!";
-                console.log('Success:', data);
-            })
-            .catch(error => {
-                document.getElementById('status-message').innerText = "Failed to send feedback.";
-                console.error('Error:', error);
-            });
-        }
-    </script>
+    document.getElementById("good").addEventListener("click", () => sendToWebhook("Good"));
+    document.getElementById("bad").addEventListener("click", () => sendToWebhook("Bad"));
+  </script>
 
 </body>
 </html>
