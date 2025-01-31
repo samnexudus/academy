@@ -17,9 +17,7 @@
 
       function loadIframe() {
         const courseName = getCourseNameFromURL();
-        document.getElementById("course-name").textContent = courseName;
-        const url = `https://airtable.com/embed/appdInia1qyUjAidC/paghPEvcF3ZihmLQt/form`;
-
+        const url = `https://airtable.com/embed/appdInia1qyUjAidC/paghPEvcF3ZihmLQt/form?prefill_Course+Name=${courseName}`;
         var iframe = document.getElementById("airtable-embed");
         iframe.src = url;
       }
