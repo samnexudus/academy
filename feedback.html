@@ -24,41 +24,23 @@
         return filename.replace(".html", "");
       }
 
-      const courseName = getCourseNameFromURL();
-      document.getElementById("course-name").textContent = courseName;
+      function loadIframe() {
+        const courseName = getCourseNameFromURL();
+        document.getElementById("course-name").textContent = courseName;
+        const url = `https://airtable.com/embed/appdInia1qyUjAidC/paghPEvcF3ZihmLQt/form`;
 
-      function sendToWebhook(feedback) {
-        const data = {
-          CourseName: courseName,
-          Feedback: feedback,
-          Timestamp: new Date().toISOString(),
-        };
-
-        console.log("Sending data to Webhook:", data);
-
-        fetch(webhookURL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        })
-          .then((response) => response.json())
-          .then((responseData) => {
-            console.log("Response from Webhook:", responseData);
-            document.getElementById("response").textContent = "Feedback sent!";
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-            document.getElementById("response").textContent =
-              "Error sending feedback.";
-          });
+        var iframe = document.getElementById("airtable-embed");
+        iframe.src = url;
       }
-
-      document
-        .getElementById("good")
-        .addEventListener("click", () => sendToWebhook("Good"));
-      document
-        .getElementById("bad")
-        .addEventListener("click", () => sendToWebhook("Bad"));
     </script>
+    <iframe
+      class="airtable-embed"
+      id="airtable-embed"
+      frameborder="0"
+      onmousewheel=""
+      width="100%"
+      height="533"
+      style="background: transparent; border: 1px solid #ccc"
+    ></iframe>
   </body>
 </html>
