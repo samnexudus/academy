@@ -19,9 +19,7 @@
     <script>
       // Function to extract the course name from the SCORM file URL
       function getCourseNameFromURL() {
-        const path = window.location.pathname;
-        const filename = path.split("/").pop();
-        return filename.replace(".html", "");
+        return window.parent.document.title.split(" | ")[0];
       }
 
       function loadIframe() {
