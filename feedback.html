@@ -1,61 +1,64 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Course Feedback</title>
-  <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Course Feedback</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <h1>Course Feedback</h1>
+    <p>Course: <strong id="course-name"></strong></p>
+    <p>Was this course helpful?</p>
+    <button class="good" id="good">Good</button>
+    <button class="bad" id="bad">Bad</button>
+    <p id="response"></p>
 
-  <h1>Course Feedback</h1>
-  <p>Course: <strong id="course-name"></strong></p>
-  <p>Was this course helpful?</p>
-  <button class="good" id="good">Good</button>
-  <button class="bad" id="bad">Bad</button>
-  <p id="response"></p>
+    <script>
+      const webhookURL = "https://hooks.zapier.com/hooks/catch/90819/2fey9j5/";
 
-  <script>
-    const webhookURL = "https://hooks.airtable.com/workflows/v1/genericWebhook/appdInia1qyUjAidC/wfl7NhRg3j8GZ83cq/wtrqlYKwEyA9yu68K"; 
+      // Function to extract the course name from the SCORM file URL
+      function getCourseNameFromURL() {
+        const path = window.location.pathname;
+        const filename = path.split("/").pop();
+        return filename.replace(".html", "");
+      }
 
-    // Function to extract the course name from the SCORM file URL
-    function getCourseNameFromURL() {
-      const path = window.location.pathname;
-      const filename = path.split("/").pop(); 
-      return filename.replace(".html", ""); 
-    }
+      const courseName = getCourseNameFromURL();
+      document.getElementById("course-name").textContent = courseName;
 
-    const courseName = getCourseNameFromURL();
-    document.getElementById("course-name").textContent = courseName; 
+      function sendToWebhook(feedback) {
+        const data = {
+          CourseName: courseName,
+          Feedback: feedback,
+          Timestamp: new Date().toISOString(),
+        };
 
-    function sendToWebhook(feedback) {
-      const data = { 
-        CourseName: courseName, 
-        Feedback: feedback, 
-        Timestamp: new Date().toISOString() 
-      };
+        console.log("Sending data to Webhook:", data);
 
-      console.log("Sending data to Webhook:", data);
+        fetch(webhookURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        })
+          .then((response) => response.json())
+          .then((responseData) => {
+            console.log("Response from Webhook:", responseData);
+            document.getElementById("response").textContent = "Feedback sent!";
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            document.getElementById("response").textContent =
+              "Error sending feedback.";
+          });
+      }
 
-      fetch(webhookURL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      })
-      .then(response => response.json())
-      .then(responseData => {
-        console.log("Response from Webhook:", responseData);
-        document.getElementById("response").textContent = "Feedback sent!";
-      })
-      .catch(error => {
-        console.error("Error:", error);
-        document.getElementById("response").textContent = "Error sending feedback.";
-      });
-    }
-
-    document.getElementById("good").addEventListener("click", () => sendToWebhook("Good"));
-    document.getElementById("bad").addEventListener("click", () => sendToWebhook("Bad"));
-  </script>
-
-</body>
+      document
+        .getElementById("good")
+        .addEventListener("click", () => sendToWebhook("Good"));
+      document
+        .getElementById("bad")
+        .addEventListener("click", () => sendToWebhook("Bad"));
+    </script>
+  </body>
 </html>
